@@ -1,0 +1,15 @@
+- name: Versione pacchetti
+  client: local
+  tgt: '*'
+  fun: pkg.version
+  arg:
+    - autossh-tunnel
+    - salt-minion
+    - filebeat
+    - metricbeat
+
+- name: Ping minions
+  client: local
+  tgt: '*'
+  fun: test.ping
+

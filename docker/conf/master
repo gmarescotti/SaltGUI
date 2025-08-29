@@ -16,6 +16,13 @@ external_auth:
       - '@wheel'
       - '@jobs'
 
+saltgui_output_formats:
+  - table
+  - nested
+  - json
+  - doc
+  - saltguihighstate
+
 rest_cherrypy:
     port: 3333
     host: 0.0.0.0
@@ -31,19 +38,92 @@ netapi_enable_clients:
     - wheel
 
 saltgui_templates:
-    template1:
-        description: First template
+
+    check_acc_versions:
+        description: Lista pacchetti TML ACC installati
         target: "*"
-        command: test.fib num=10
-    template2:
-        description: Second template
-        targettype: glob
-        target: "*ubuntu*"
-        command: test.version
-    template3:
-        description: Empty template
-    template4:
-        description: Fourth template
-        targettype: compound
-        target: "G@os:Ubuntu"
-        command: test.version
+        command: pkg.version serverdiag "gwd-serverdiag" linux_cots_x64_diagserver linux_cots_x64_waninterface se_agent se_aligner se_decoder
+
+    read_system_info:
+        description: Legge Modello e Versione Macchina
+        target: "*"
+        command: cmd.run "cat /etc/system_model && cat /etc/system_version && cat /etc/hostname && cat /etc/salt/minion_id"
+
+    test_ping:
+        description: test ping
+        target: "*"
+        command: test.ping
+
+    remove_cdrom_source_list:
+        description: commenta il cdrom come repository debian
+        target: "*"
+        command: cmd.run "sed -i 's/^deb cdrom/#deb cdrom/' /etc/apt/sources.list"
+
+    services_status:
+        description: visualizza lo stato dei servizi
+        target: "*"
+        command: service.status filebeat metricbeat
+
+    check_elk_versions:
+        description: Lista pacchetti Elastic Search
+        target: "*"
+        command: pkg.version filebeat metricbeat
+
+    check_ram:
+        description: stampa RAM in gigabyte
+        target: "*"
+        command: cmd.run "echo $((($(salt-call --local grains.get mem_total --out=txt | awk '{print $2}') + 1024) / 1024)) GB" --timeout=3
+
+    count_exceptions:
+        description: conta il numero di "Exception" in ServerDiag.log
+        target: "*"
+        command: cmd.run "grep Exception /ServerDiag/software/logs/ServerDiag.log | wc -l" --timeout=2
+
+#pkg.purge
+#pkg.install metricbeat refresh=true
+#service.restart metricbeat
+#
+# istalla filebeat
+#state.sls filebeat
+
+# check versione salt minion
+#test.version
+
+# check ram totale
+#grains.item mem_total
+
+# performance disco
+# cmd.run "hdparm -Tt /dev/sda"
+
+# pkg.install hdparm refresh=true
+
+# command: cmd.run "salt-call test.ping"
+
+# command: cmd.run "systemctl status filebeat metricbeat"
+#     update_salt_minion:
+#         description: Aggiorna salt minion
+#         target: "*"
+#         command: cmd.run "apt update || true && apt install salt-minion -y && systemctl restart salt-minion"
+# 
+#     status_salt_minion:
+#         description: Visualizza status di salt minion
+#         target: "*"
+#         command: cmd.run "systemctl start salt-minion"
+
+# key: "v"
+#     template1:
+#         description: First template
+#         target: "*"
+#         command: test.fib num=10
+#     template2:
+#         description: Second template
+#         targettype: glob
+#         target: "*ubuntu*"
+#         command: test.version
+#     template3:
+#         description: Empty template
+#     template4:
+#         description: Fourth template
+#         targettype: compound
+#         target: "G@os:Ubuntu"
+#         command: test.version
