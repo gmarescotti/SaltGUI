@@ -12,6 +12,8 @@ services:
     - ./conf/master:/etc/salt/master
     - ../saltgui:/saltgui
 
+    restart: unless-stopped
+
   #   saltminion-ubuntu:
   #     image: erwindon/saltgui-saltminion-ubuntu:3007.4
   #     hostname: saltminion-ubuntu
