@@ -79,6 +79,10 @@ saltgui_templates:
         target: "*"
         command: cmd.run "grep Exception /ServerDiag/software/logs/ServerDiag.log | wc -l" --timeout=2
 
+reactor:
+  - 'system/alarm':
+    - /srv/reactor/alarm_notify.sls
+
 #pkg.purge
 #pkg.install metricbeat refresh=true
 #service.restart metricbeat
